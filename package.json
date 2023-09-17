@@ -1,0 +1,22 @@
+{
+  "name": "weather_api_nodejs",
+  "version": "1.0.0",
+  "description": "a mini project, using weather api to display weather forecasting of a region",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss styles.css -o public/css/styles.css --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.15",
+    "axios": "^1.5.0",
+    "express": "^4.18.2",
+    "postcss": "^8.4.29",
+    "tailwindcss": "^3.3.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.4"
+  }
+}
