@@ -103,7 +103,7 @@ app.get("/", async (req, res) => {
     if (response.status === 200) {
       res.writeHead(200, { "Content-Type": "text/html" });
       const DataArr = [response.data];
-      console.log(DataArr[0].forecast.forecastday[0].hour[0].temp_c);
+      // console.log(DataArr[0].forecast.forecastday[0].hour[0].temp_c);
       const RealTimeData = DataArr.map((value) => {
         return replaceValue(homeFile, value);
       }).join("");
@@ -114,13 +114,11 @@ app.get("/", async (req, res) => {
         "Weather API request failed with status code",
         response.status,
       );
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Internal Server Error");
+      res.status(500).send("Internal Server Error");
     }
   } catch (error) {
     console.error("Error:", error);
-    res.writeHead(500, { "Content-Type": "text/plain" });
-    res.end("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 });
 
