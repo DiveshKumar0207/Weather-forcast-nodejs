@@ -4,7 +4,8 @@
   "description": "a mini project, using weather api to display weather forecasting of a region",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwindcss styles.css -o public/css/styles.css --watch"
+    "build:css": "tailwindcss src/styles.css -o public/css/styles.css --watch",
+    "start": "nodemon src/index.js -e js,hbs,html"
   },
   "author": "",
   "license": "ISC",

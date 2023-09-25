@@ -5,10 +5,11 @@ const path = require("path");
 const app = express();
 const port = 8080;
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // accessing index-html file
-const homeFile = fs.readFileSync("home.html", "utf-8");
+const staticHtml = path.join(__dirname, "../public/home.html");
+const homeFile = fs.readFileSync(staticHtml, "utf-8");
 
 const d = new Date();
 const weekands = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
