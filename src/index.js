@@ -50,8 +50,7 @@ function replaceValue(homeFileData, orgVal) {
 
     const periods = hrr < 12 ? "A.M" : "P.M";
 
-    // to display hour in 12 hour format
-    const hrr12 = hrr > 12 ? hrr - 12 : hrr;
+    let hrr12 = hrr > 12 ? hrr - 12 : hrr;
 
     if (hrr === 0) {
       hrr12 = 12;
@@ -65,7 +64,7 @@ function replaceValue(homeFileData, orgVal) {
     changeData = changeData.replace(`{%periods_${i}%}`, periods);
   }
   // forecast update
-  for(i=1; i<=6; i++){
+  for(i=1; i<=2; i++){
     const nextDayIndex = (d.getDay() + i) % 7; //to get days of week
     
     if(d.getDate()+i === 1){            //setting next month 
@@ -82,18 +81,6 @@ function replaceValue(homeFileData, orgVal) {
   }
   return changeData;
 }
-
-// Serve JavaScript file
-// app.get("/public/style.js", (req, res) => {
-//   res.setHeader("Content-Type", "application/javascript");
-//   res.sendFile(path.join(__dirname, "public/style.js"));
-// });
-
-// // Serve CSS file
-// app.get("/public/css/styles.css", (req, res) => {
-//   res.setHeader("Content-Type", "text/css");
-//   res.sendFile(path.join(__dirname, "public/css/styles.css"));
-// });
 
 app.get("/", async (req, res) => {
   try {
@@ -115,11 +102,11 @@ app.get("/", async (req, res) => {
         "Weather API request failed with status code",
         response.status,
       );
-      res.status(500).send("Internal Server Error");
+      res.status(400).send("Internal Server Error");
     }
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(400).send("Internal Server Error");
   }
 });
 
