@@ -2,14 +2,20 @@ const fs = require("fs");
 const express = require("express");
 const axios = require("axios");
 const path = require("path");
-const app = express();
+var hbs = require("hbs");
+
 const port = 8080;
 
-app.use(express.static(path.join(__dirname, "../public")));
+const staticPath = path.join(__dirname, "../public");
+const templatePath = path.join(__dirname, "../templates/views");
+const partialsPath = path.join(__dirname, "../templates/partials");
 
-// accessing index-html file
-const staticHtml = path.join(__dirname, "../public/home.html");
-const homeFile = fs.readFileSync(staticHtml, "utf-8");
+const app = express();
+app.use(express.static(staticPath));
+
+app.set("view engine", "hbs");
+app.set("views", templatePath);
+hbs.registerPartials(partialsPath, (err) => {});
 
 const d = new Date();
 const weekands = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -29,24 +35,66 @@ const months = [
 ];
 
 // prettier-ignore
-// function to replace html data with realtimedata
-function replaceValue(homeFileData, orgVal) {
-  let changeData = homeFileData.replace("{%current_temp%}", orgVal.current.temp_c);
-  changeData = changeData.replace("{%place%}", orgVal.location.name);
-  changeData = changeData.replace("{%state%}", orgVal.location.region);
-  changeData = changeData.replace("{%current_icon%}", orgVal.current.condition.icon);
+function futureDataUpdate(DataArr) {
 
-  // future hours forcast from current time
-  for(let i=1; i<=5 ;i++){
+  const futureData =[];
+
+  for(i=1; i<=2; i++){
+    const nextDayIndex = (d.getDay() + i) % 7; //to get days of week
+
+    if(d.getDate()+i === 1){            //setting next month
+      d.setMonth(d.getMonth()+1);
+    }
+
+
+    futureData.push({
+      day_weekDay: weekands[nextDayIndex],
+      day_date: [d.getDate()+i],
+      day_month: months[d.getMonth()],
+      day_humidity: DataArr[0].forecast.forecastday[i].day.avghumidity,
+      day_icon : DataArr[0].forecast.forecastday[i].day.condition.icon,
+      day_minTemp : Math.round(DataArr[0].forecast.forecastday[i].day.mintemp_c),
+      day_maxTemp : Math.round(DataArr[0].forecast.forecastday[i].day.maxtemp_c),
+
+
+    })
+    // changeData = changeData.replace(`{%day${i+1}_weekDay}`, weekands[nextDayIndex]);
+    // changeData = changeData.replace(`{%day${i+1}_date}`, [d.getDate()+i]);
+    // changeData = changeData.replace(`{%day${i+1}_month}`, months[d.getMonth()]);
+    // changeData = changeData.replace(`{%day${i+1}_humidity}`, orgVal.forecast.forecastday[i].day.avghumidity);
+    // changeData = changeData.replace(`{%day${i+1}_icon%}`, orgVal.forecast.forecastday[i].day.condition.icon);
+    // changeData = changeData.replace(`{%day${i+1}_minTemp%}`, Math.round(orgVal.forecast.forecastday[i].day.mintemp_c));
+    // changeData = changeData.replace(`{%day${i+1}_maxTemp%}`, Math.round(orgVal.forecast.forecastday[i].day.maxtemp_c));
+  }
+  return futureData;
+
+}
+
+function currentDataUpdate(DataArr) {
+  const currentTimeData = [];
+
+  currentTimeData.push({
+    current_temp: DataArr[0].current.temp_c,
+    place: DataArr[0].location.name,
+    state: DataArr[0].location.region,
+    current_icon: DataArr[0].current.condition.icon,
+  });
+  return currentTimeData;
+}
+
+// prettier-ignore
+function futureHoursUpdate(DataArr) {
+  const changeData = [];
+  for (let i = 1; i <= 5; i++) {
     let hrr = d.getHours();
-    hrr = (hrr + 2*i);
+    hrr = hrr + 2 * i;
     let forecastIndex = 0; // Initialize with the current day's forecast data
 
-  // Check if the calculated hour goes beyond 23 (into the next day)
-  if (hrr >= 24) {
-    hrr -= 24; // Normalize the hour
-    forecastIndex = 1; // Use forecast data for the next day
-  }
+    // Check if the calculated hour goes beyond 23 (into the next day)
+    if (hrr >= 24) {
+      hrr -= 24;
+      forecastIndex = 1; // Use forecast data for the next day
+    }
 
     const periods = hrr < 12 ? "A.M" : "P.M";
 
@@ -56,28 +104,12 @@ function replaceValue(homeFileData, orgVal) {
       hrr12 = 12;
     }
 
-   
-    changeData = changeData.replace(`{%current_temp_${i}%}`, orgVal.forecast.forecastday[forecastIndex].hour[ hrr].temp_c);
-    changeData = changeData.replace(`{%current_icon_${i}%}`, orgVal.forecast.forecastday[forecastIndex].hour[ hrr].condition.icon);
-  
-    changeData = changeData.replace(`{%current_hour_${i}%}`, hrr12);
-    changeData = changeData.replace(`{%periods_${i}%}`, periods);
-  }
-  // forecast update
-  for(i=1; i<=2; i++){
-    const nextDayIndex = (d.getDay() + i) % 7; //to get days of week
-    
-    if(d.getDate()+i === 1){            //setting next month 
-      d.setMonth(d.getMonth()+1);
-    }
-
-    changeData = changeData.replace(`{%day${i+1}_weekDay}`, weekands[nextDayIndex]);
-    changeData = changeData.replace(`{%day${i+1}_date}`, [d.getDate()+i]);
-    changeData = changeData.replace(`{%day${i+1}_month}`, months[d.getMonth()]);
-    changeData = changeData.replace(`{%day${i+1}_humidity}`, orgVal.forecast.forecastday[i].day.avghumidity);
-    changeData = changeData.replace(`{%day${i+1}_icon%}`, orgVal.forecast.forecastday[i].day.condition.icon);
-    changeData = changeData.replace(`{%day${i+1}_minTemp%}`, Math.round(orgVal.forecast.forecastday[i].day.mintemp_c));
-    changeData = changeData.replace(`{%day${i+1}_maxTemp%}`, Math.round(orgVal.forecast.forecastday[i].day.maxtemp_c));
+    changeData.push({
+      current_temp_1: DataArr[0].forecast.forecastday[forecastIndex].hour[hrr].temp_c,
+      current_icon_1: DataArr[0].forecast.forecastday[forecastIndex].hour[hrr].condition.icon,
+      current_hour_1: hrr12,
+      periods_1: periods,
+    });
   }
   return changeData;
 }
@@ -89,14 +121,17 @@ app.get("/", async (req, res) => {
     );
 
     if (response.status === 200) {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      const DataArr = [response.data];
-      // console.log(DataArr[0].forecast.forecastday[0].hour[0].temp_c);
-      const RealTimeData = DataArr.map((value) => {
-        return replaceValue(homeFile, value);
-      }).join("");
-      res.write(RealTimeData);
-      res.end();
+      var DataArr = [response.data];
+
+      const RealTimeData = currentDataUpdate(DataArr);
+      const futureHoursData = futureHoursUpdate(DataArr);
+      const futureDaysData = futureDataUpdate(DataArr);
+
+      res.render("home", {
+        HbsRealTimeData: RealTimeData,
+        HbsfutureHoursData: futureHoursData,
+        HbsfutureDaysData: futureDaysData,
+      });
     } else {
       console.error(
         "Weather API request failed with status code",
