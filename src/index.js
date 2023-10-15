@@ -3,6 +3,7 @@ const express = require("express");
 const axios = require("axios");
 const path = require("path");
 var hbs = require("hbs");
+const app = express();
 
 const port = 8080;
 
@@ -10,7 +11,18 @@ const staticPath = path.join(__dirname, "../public");
 const templatePath = path.join(__dirname, "../templates/views");
 const partialsPath = path.join(__dirname, "../templates/partials");
 
-const app = express();
+// hbs-file path
+const homeHbsPath = path.join(__dirname, "../templates/views/home.hbs");
+// output-html path
+const outputHtmlPath = path.join(__dirname, "../public/output.html");
+// read hbs file
+// const hbsTemplate = fs.readFileSync(homeHbsPath, "utf-8");
+// const compiledTemplate = hbs.compile(hbsTemplate);
+
+//
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 app.use(express.static(staticPath));
 
 app.set("view engine", "hbs");
@@ -114,24 +126,32 @@ function futureHoursUpdate(DataArr) {
   return changeData;
 }
 
+var cityName = "sonipat.haryana";
+
 app.get("/", async (req, res) => {
   try {
     const response = await axios.get(
-      "http://api.weatherapi.com/v1/forecast.json?key=2d6d75692baf4c25bf815310231309&q=sonipat,haryana&days=7&aqi=yes&alerts=yes",
+      `http://api.weatherapi.com/v1/forecast.json?key=2d6d75692baf4c25bf815310231309&q=${cityName}&days=7&aqi=yes&alerts=yes`,
     );
 
     if (response.status === 200) {
       var DataArr = [response.data];
 
-      const RealTimeData = currentDataUpdate(DataArr);
-      const futureHoursData = futureHoursUpdate(DataArr);
-      const futureDaysData = futureDataUpdate(DataArr);
+      var RealTimeData = currentDataUpdate(DataArr);
+      var futureHoursData = futureHoursUpdate(DataArr);
+      var futureDaysData = futureDataUpdate(DataArr);
 
-      res.render("home", {
+      var data = {
         HbsRealTimeData: RealTimeData,
         HbsfutureHoursData: futureHoursData,
         HbsfutureDaysData: futureDaysData,
-      });
+      };
+
+      // compile hbs to html
+      // const html = compiledTemplate(data);
+      // fs.writeFileSync(outputHtmlPath, html, "utf-8");
+
+      res.render("home", data);
     } else {
       console.error(
         "Weather API request failed with status code",
@@ -145,6 +165,46 @@ app.get("/", async (req, res) => {
   }
 });
 
+app.post("/", async (req, res) => {
+  cityName = req.body.cityName;
+  console.log(cityName);
+  try {
+    const response = await axios.get(
+      `http://api.weatherapi.com/v1/forecast.json?key=2d6d75692baf4c25bf815310231309&q=${cityName}&days=7&aqi=yes&alerts=yes`,
+    );
+
+    if (response.status === 200) {
+      var DataArr = [response.data];
+
+      const RealTimeData = currentDataUpdate(DataArr);
+      const futureHoursData = futureHoursUpdate(DataArr);
+      const futureDaysData = futureDataUpdate(DataArr);
+
+      var data = {
+        HbsRealTimeData: RealTimeData,
+        HbsfutureHoursData: futureHoursData,
+        HbsfutureDaysData: futureDaysData,
+      };
+
+      // compile hbs to html
+      // const html = compiledTemplate(data);
+      // fs.writeFileSync(outputHtmlPath, html, "utf-8");
+
+      res.render("home", data);
+    } else {
+      console.error(
+        "Weather API request failed with status code",
+        response.status,
+      );
+      res.status(400).send("Internal Server Error");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(400).send("Internal Server Error");
+  }
+});
+
+// listening port
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

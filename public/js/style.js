@@ -24,11 +24,12 @@ const CurrentTime = getTime();
 // appending data to webpage
 
 document.addEventListener("DOMContentLoaded", () => {
-  try {
-    setInterval(() => {
-      dispTime.innerHTML = CurrentTime;
-    }, 100);
-  } catch (error) {
-    console.error(error);
-  }
+  dispTime.innerHTML = CurrentTime;
+  // try {
+  //   setInterval(() => {
+  //     dispTime.innerHTML = CurrentTime;
+  //   }, 100);
+  // } catch (error) {
+  //   console.error(error);
+  // }
 });

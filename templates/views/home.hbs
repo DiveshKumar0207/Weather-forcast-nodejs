@@ -7,9 +7,32 @@
     <link rel="stylesheet" type="text/css" href="css/styles.css" />
   </head>
   <body>
-    <div
+        {{!-- search city --}}
+       <div
+        class="top- absolute left-8 top-24 flex h-fit w-80 max-w-screen-sm flex-col space-y-6 rounded-xl bg-white p-10 ring-8 ring-white ring-opacity-40"
+      >
+      
+  <form class="bg-slate-100 shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post" action="/">
+    <div class="mb-4">
+
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="citySearch" name="cityName" type="text" placeholder="City" required>
+    </div>
+   
+    <div class="flex items-center justify-between">
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"id="searchButton">
+        Search
+      </button>
+    </div>
+  </form>
+
+
+      </div>
+
+    <div  id="weatherInfo"
       class="flex min-h-screen w-screen flex-col items-center justify-center bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200 p-10 text-gray-700"
     >
+
+
       <!--------------------- Component Start ----------------->
       <div
         class="w-full max-w-screen-sm rounded-xl bg-white p-10 ring-8 ring-white ring-opacity-40"
@@ -91,11 +114,11 @@
         {{/each}}
    
       </div>
-      <!-- <div
-        class="top- absolute left-0 top-0 mx-2 mt-10 flex h-screen w-96 max-w-screen-sm flex-col space-y-6 rounded-xl bg-white p-10 ring-8 ring-white ring-opacity-40"
-      ></div> -->
+
+      
       <!-------------------------- Component End  ---------------------->
     </div>
     <script type="application/javascript" src="js/style.js"></script>
+    <script type="module" src="js/client.js"></script>
   </body>
 </html>
