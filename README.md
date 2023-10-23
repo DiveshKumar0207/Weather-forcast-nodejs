@@ -1,2 +1,3 @@
 # Weather_api_nodejs
-a mini project, using weather api to display weather forecasting of a region 
+1. Used NodeJs, ExpressJS, HBS template engine
+2. weather forecast in backend
