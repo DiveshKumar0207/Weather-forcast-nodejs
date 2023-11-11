@@ -45,7 +45,7 @@ Follow these steps to get the project up and running on your local machine:
 4. **Css production build**
 
    ```bash
-   npm build
+   npm build:css
    ```
 
    The application will be accessible at `http://localhost:5173` by default.
