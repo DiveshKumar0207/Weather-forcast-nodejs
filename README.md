@@ -48,11 +48,11 @@ Follow these steps to get the project up and running on your local machine:
    npm build:css
    ```
 
-   The application will be accessible at `http://localhost:5173` by default.
+   The application will be accessible at `http://localhost:3000` by default.
 
 ## Usage
 
-1. Open your web browser and go to `http://localhost:5173`.
+1. Open your web browser and go to `http://localhost:3000`.
 2. Enter the name of the city in the search bar and click the "Search" button.
 3. View the current weather conditions and the forecast for the entered city.
 
